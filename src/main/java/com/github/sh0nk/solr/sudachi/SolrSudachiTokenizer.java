@@ -1,5 +1,6 @@
 /*
  *  Copyright (c) 2017 Works Applications Co., Ltd.
+ *  Modification (c) 2018 sh0nk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +39,7 @@ import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
 
-public final class SudachiTokenizer extends
+public final class SolrSudachiTokenizer extends
         org.apache.lucene.analysis.Tokenizer {
     public static final Mode DEFAULT_MODE = Mode.SEARCH;
 
@@ -72,14 +73,14 @@ public final class SudachiTokenizer extends
     private int aUnitSize = 0;
     private int oovSize = 0;
 
-    public SudachiTokenizer(boolean discardPunctuation, Mode mode,
-                            String resourcesPath, String settings) throws IOException {
+    public SolrSudachiTokenizer(boolean discardPunctuation, Mode mode,
+                                String resourcesPath, String settings) throws IOException {
         this(DEFAULT_TOKEN_ATTRIBUTE_FACTORY, discardPunctuation, mode,
                 resourcesPath, settings);
     }
 
-    public SudachiTokenizer(AttributeFactory factory,
-                            boolean discardPunctuation, Mode mode, String path, String settings)
+    public SolrSudachiTokenizer(AttributeFactory factory,
+                                boolean discardPunctuation, Mode mode, String path, String settings)
             throws IOException {
         super(factory);
         this.discardPunctuation = discardPunctuation;
@@ -179,7 +180,10 @@ public final class SudachiTokenizer extends
         readingAtt.setMorpheme(morpheme);
         offsetAtt.setOffset(baseOffset + morpheme.begin(),
                             baseOffset + morpheme.end());
-        setTermAttribute(morpheme.normalizedForm());
+
+        /* Modification from the original SudachiTokenizer's Morpheme#getNotmalizedForm
+        to get the original token */
+        setTermAttribute(morpheme.surface());
     }
 
     private void setOOVAttribute(String str) throws IOException {
