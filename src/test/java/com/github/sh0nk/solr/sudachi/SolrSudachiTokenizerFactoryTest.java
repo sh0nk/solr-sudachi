@@ -13,9 +13,11 @@ import java.util.Map;
 public class SolrSudachiTokenizerFactoryTest extends BaseTokenStreamTestCase {
 
     private Tokenizer createTokenizer(Map<String, String> args) throws IOException {
-        String dictFile = SolrSudachiTokenizerFactoryTest.class.getResource("/system_core.dic").getPath();
+        String dictFile = SolrSudachiTokenizerFactory.class.getResource("/system_full.dic").getPath();
+        String settingsFile = SolrSudachiTokenizerFactory.class.getResource("/solr_sudachi.json").getPath();
         Map<String, String> map = new HashMap<>(args);
         map.put("systemDictPath", dictFile);
+        map.put("settingsPath", settingsFile);
         SolrSudachiTokenizerFactory factory = new SolrSudachiTokenizerFactory(map);
         factory.inform(new SolrResourceLoader());
         return factory.create(newAttributeFactory());

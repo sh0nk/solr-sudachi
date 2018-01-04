@@ -17,6 +17,7 @@
 
     <repositories>
         <repository>
+            <!-- https://oss.sonatype.org/content/repositories/snapshots/com/worksap/nlp/sudachi/0.1.1-SNAPSHOT/ -->
             <id>sonatype-snapshot</id>
             <name>Sonatype Snapshot Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -36,6 +37,16 @@
             <groupId>com.worksap.nlp</groupId>
             <artifactId>analysis-sudachi</artifactId>
             <version>${analysis-sudachi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch.client</groupId>
+                    <artifactId>transport</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-analyzers-kuromoji</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Lucene/Solr -->
@@ -43,16 +54,19 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${solr.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-test-framework</artifactId>
             <version>${solr.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>${solr.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test -->
@@ -77,7 +91,38 @@
                 </configuration>
             </plugin>
 
-            <!-- For test with a real dictionary -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/system_full.dic</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Fat jar -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+
+            <!-- For assembly/test with a real dictionary -->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.0.0</version>
@@ -86,7 +131,7 @@
                         <fileset>
                             <directory>src/test/resources/</directory>
                             <includes>
-                                <include>system_core.dic</include>
+                                <include>system_full.dic</include>
                             </includes>
                         </fileset>
                     </filesets>
@@ -97,9 +142,11 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.0.2</version>
                 <executions>
+                    <!-- TODO: This must be moved to another package to include dict file -->
+                    <!--
                     <execution>
-                        <id>unpack-system-dic</id>
-                        <phase>generate-test-resources</phase>
+                        <id>unpack-full-dic-assembly</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -108,11 +155,32 @@
                                 <artifactItem>
                                     <groupId>com.worksap.nlp</groupId>
                                     <artifactId>sudachi</artifactId>
-                                    <classifier>dictionary-core</classifier>
+                                    <classifier>dictionary-full</classifier>
                                     <version>${sudachi.version}</version>
-                                    <type>zip</type>
+                                    <type>tar.bz2</type>
+                                    <outputDirectory>src/main/resources</outputDirectory>
+                                    <includes>system_full.dic</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    -->
+                    <execution>
+                        <id>unpack-full-dic-test</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.worksap.nlp</groupId>
+                                    <artifactId>sudachi</artifactId>
+                                    <classifier>dictionary-full</classifier>
+                                    <version>${sudachi.version}</version>
+                                    <type>tar.bz2</type>
                                     <outputDirectory>src/test/resources</outputDirectory>
-                                    <includes>system_core.dic</includes>
+                                    <includes>system_full.dic</includes>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

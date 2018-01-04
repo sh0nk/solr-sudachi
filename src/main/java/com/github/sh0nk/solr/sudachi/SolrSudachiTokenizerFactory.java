@@ -7,6 +7,9 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -17,7 +20,7 @@ import java.util.Map;
  *     &lt;tokenizer class="com.github.sh0nk.solr.sudachi.SolrSudachiTokenizerFactory"
  *       mode="NORMAL"
  *       systemDictPath="sudachi/system_core.dic"
- *       settingsPath="sudachi.json"
+ *       settingsPath="solr_sudachi.json"
  *       discardPunctuation="true"
  *     /&gt;
  *   &lt;/analyzer&gt;
@@ -46,7 +49,7 @@ public class SolrSudachiTokenizerFactory extends TokenizerFactory implements Res
     private final String settingsPath;
 
     private String fixedSystemDictDir = null;
-    private String fixedSettingsPath = null;
+    private Path fixedSettingsPath = null;
 
     public SolrSudachiTokenizerFactory(Map<String, String> args) {
         super(args);
@@ -74,17 +77,29 @@ public class SolrSudachiTokenizerFactory extends TokenizerFactory implements Res
     public void inform(ResourceLoader resourceLoader) throws IOException {
         ResourceLoaderHelper resourceLoaderHelper = new ResourceLoaderHelper(resourceLoader);
         if (settingsPath != null) {
-            fixedSettingsPath = resourceLoaderHelper.getResourcePath(settingsPath).toString();
+            fixedSettingsPath = resourceLoaderHelper.getResourcePath(settingsPath);
         }
         if (systemDictPath != null) {
             fixedSystemDictDir = resourceLoaderHelper.getResourcePath(systemDictPath).getParent().toString();
         }
     }
 
+    private String getSettingsFileContent() {
+        if (fixedSettingsPath == null) {
+            return null;
+        }
+
+        try {
+            return new String(Files.readAllBytes(fixedSettingsPath), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Cannot read Sudachi settings file from " + fixedSettingsPath);
+        }
+    }
+
     @Override
     public Tokenizer create(AttributeFactory attributeFactory) {
         try {
-            return new SolrSudachiTokenizer(discardPunctuation, mode, fixedSystemDictDir, fixedSettingsPath);
+            return new SolrSudachiTokenizer(discardPunctuation, mode, fixedSystemDictDir, getSettingsFileContent());
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to create SolrSudachiTokenizer", e);
         }
