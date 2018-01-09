@@ -52,6 +52,7 @@ public final class SolrSudachiTokenizer extends
     private final Dictionary dictionary;
     private final Tokenizer tokenizer;
     private final CharTermAttribute termAtt;
+    private final SurfaceFormAttribute surfaceAtt;
     private final BaseFormAttribute basicFormAtt;
     private final PartOfSpeechAttribute posAtt;
     private final ReadingAttribute readingAtt;
@@ -68,6 +69,7 @@ public final class SolrSudachiTokenizer extends
     private char[] buffer = new char[BUFFER_SIZE];
     private int baseOffset = 0;
     private int nextBaseOffset = 0;
+    private int lastEndOffset = 0;
     private int remainSize = 0;
     private int oovBegin = 0;
     private int aUnitSize = 0;
@@ -89,6 +91,7 @@ public final class SolrSudachiTokenizer extends
         tokenizer = dictionary.create();
 
         termAtt = addAttribute(CharTermAttribute.class);
+        surfaceAtt = addAttribute(SurfaceFormAttribute.class);
         basicFormAtt = addAttribute(BaseFormAttribute.class);
         posAtt = addAttribute(PartOfSpeechAttribute.class);
         readingAtt = addAttribute(ReadingAttribute.class);
@@ -175,19 +178,20 @@ public final class SolrSudachiTokenizer extends
     }
 
     private void setMorphemeAttributes(Morpheme morpheme) throws IOException {
+        surfaceAtt.setMorpheme(morpheme);
         basicFormAtt.setMorpheme(morpheme);
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
+        lastEndOffset = baseOffset + morpheme.end();
         offsetAtt.setOffset(baseOffset + morpheme.begin(),
-                            baseOffset + morpheme.end());
+                lastEndOffset);
 
-        /* Modification from the original SudachiTokenizer's Morpheme#getNotmalizedForm
-        to get the original token */
-        setTermAttribute(morpheme.surface());
+        setTermAttribute(morpheme.normalizedForm());
     }
 
     private void setOOVAttribute(String str) throws IOException {
-        offsetAtt.setOffset(baseOffset + oovBegin, baseOffset + oovBegin + 1);
+        lastEndOffset = baseOffset + oovBegin + 1;
+        offsetAtt.setOffset(baseOffset + oovBegin, lastEndOffset);
         oovBegin += 1;
         posLengthAtt.setPositionLength(1);
         if (oovIterator.previousIndex() == 0) {
@@ -289,6 +293,8 @@ public final class SolrSudachiTokenizer extends
     @Override
     public final void end() throws IOException {
         super.end();
+        int finalOffset = correctOffset(lastEndOffset);
+        offsetAtt.setOffset(finalOffset, finalOffset);
     }
 
     @Override
@@ -297,6 +303,7 @@ public final class SolrSudachiTokenizer extends
         remainSize = 0;
         baseOffset = 0;
         nextBaseOffset = 0;
+        lastEndOffset = 0;
         oovBegin = 0;
         iterator = null;
         aUnitIterator = null;

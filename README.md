@@ -5,10 +5,6 @@ A Japanese morphological analyzer Sudachi as a Solr plugin.
 This plugin is based on [elasticsearch-sudachi](https://github.com/WorksApplications/elasticsearch-sudachi)
 which includes the common lucene Tokenizer and TokenFilters.
 
-Only the difference from the original elasticsearch-sudachi is that
-`Tokenizer` outputs the original form of the input characters,
-unlike that elasticsearch-sudachi does return normalized form.
-
 ## Install
 
 1. `mvn package` to generate `solr-sudachi-1.0.0-SNAPSHOT-jar-with-dependencies.jar` in `target/`.
@@ -56,6 +52,33 @@ in the same "sudachi" directory.
 - `settingsPath`: Put the sudachi json configuration. 
 If `settingsPath` is not provided, Sudachi's default settings are used.
 
+## Token Filters
+
+In addition to the core `SolrSudachiTokenizerFactory`, several token filters
+are available as a post processing of the `Tokenizer`.
+
+### SudachiSurfaceFormFilterFactory
+
+`solr-sudachi` respects the behavior of `elasticsearch-sudachi`, which outputs 
+the *Normalized form* of the tokens instead of the *Surface* which are tokens from
+user's input text as it is. Sudachi's normalized form performs to make recall higher 
+as well as base form. But if you want to match exactly with the query and the index, 
+this filter would be useful.
+
+#### Example
+
+Before the token filter
+
+|          |1    |2   |3   |4   |5   |
+|:---------|:----|:---|:---|:---|:---|
+|Tokens    |吾が輩|は|猫|だ|有る|
+|Surface   |吾輩  |は|猫|で|ある|
+
+After the token filter
+
+|          |1    |2   |3   |4   |5   |
+|:---------|:----|:---|:---|:---|:---|
+|Tokens   |吾輩  |は|猫|で|ある|
 
 ## Licenses
 
