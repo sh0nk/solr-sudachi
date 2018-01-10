@@ -5,6 +5,8 @@ A Japanese morphological analyzer Sudachi as a Solr plugin.
 This plugin is based on [elasticsearch-sudachi](https://github.com/WorksApplications/elasticsearch-sudachi)
 which includes the common lucene Tokenizer and TokenFilters.
 
+<img width="620px" alt="solr_analysis" src="https://user-images.githubusercontent.com/6478810/34778205-fedd8e00-f65f-11e7-8f43-bb8ec848e49a.png">
+
 ## Install
 
 1. `mvn package` to generate `solr-sudachi-1.0.0-SNAPSHOT-jar-with-dependencies.jar` in `target/`.
