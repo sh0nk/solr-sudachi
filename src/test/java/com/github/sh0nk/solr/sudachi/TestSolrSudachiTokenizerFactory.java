@@ -10,7 +10,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SolrSudachiTokenizerFactoryTest extends BaseTokenStreamTestCase {
+public class TestSolrSudachiTokenizerFactory extends BaseTokenStreamTestCase {
 
     private Tokenizer createTokenizer(Map<String, String> args) throws IOException {
         String dictFile = SolrSudachiTokenizerFactory.class.getResource("/system_full.dic").getPath();
@@ -28,7 +28,7 @@ public class SolrSudachiTokenizerFactoryTest extends BaseTokenStreamTestCase {
         Tokenizer tokenizer = createTokenizer(new HashMap<>());
         tokenizer.setReader(new StringReader("吾輩は猫である。"));
         assertTokenStreamContents(tokenizer,
-                new String[] {"吾輩", "は", "猫", "で", "ある"}
+                new String[] {"我が輩", "は", "猫", "だ", "有る"}
         );
     }
 
@@ -39,7 +39,7 @@ public class SolrSudachiTokenizerFactoryTest extends BaseTokenStreamTestCase {
         }});
         tokenizer.setReader(new StringReader("吾輩は猫である。"));
         assertTokenStreamContents(tokenizer,
-                new String[] {"吾輩", "は", "猫", "で", "ある", "。"}
+                new String[] {"我が輩", "は", "猫", "だ", "有る", "。"}
         );
     }
 
