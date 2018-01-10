@@ -23,7 +23,7 @@ public final class SudachiSurfaceFormFilter extends TokenFilter {
     @Override
     public boolean incrementToken() throws IOException {
         if (input.incrementToken()) {
-            if (surfaceAtt.getSurface() != null || surfaceAtt.getSurface().isEmpty()) {
+            if (surfaceAtt != null && surfaceAtt.getSurface() != null && !surfaceAtt.getSurface().isEmpty()) {
                 termAtt.setEmpty().append(surfaceAtt.getSurface());
             }
             return true;

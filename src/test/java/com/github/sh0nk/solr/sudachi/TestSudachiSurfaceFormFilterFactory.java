@@ -3,6 +3,7 @@ package com.github.sh0nk.solr.sudachi;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.solr.core.SolrResourceLoader;
 import org.junit.Test;
 
@@ -53,6 +54,32 @@ public class TestSudachiSurfaceFormFilterFactory extends BaseTokenStreamTestCase
     public void testBasics() throws IOException {
         assertAnalyzesTo(analyzer, "吾輩は猫である。",
                 new String[] {"吾輩", "は", "猫", "で", "ある"});
+    }
+
+    @Test
+    public void testEnglish() throws IOException {
+        assertAnalyzesTo(analyzer, "This is a pen.",
+                new String[] {"This", "is", "a", "pen"});
+    }
+
+    @Test
+    public void testUnicode() throws IOException {
+        assertAnalyzesTo(analyzer, "\u1f77\u1ff2\u1f96\u1f50\u1fec  yirhp",
+                new String[] {"\u1f77", "\u1ff2\u1f96\u1f50\u1fec", "yirhp"});
+    }
+
+    @Test
+    public void testEmptyTerm() throws IOException {
+        analyzer = new Analyzer() {
+            @Override
+            protected TokenStreamComponents createComponents(String s) {
+                Tokenizer tokenizer = new KeywordTokenizer();
+                return new TokenStreamComponents(tokenizer,
+                        new SudachiSurfaceFormFilterFactory(Collections.emptyMap()).create(tokenizer));
+            }
+        };
+        checkOneTerm(analyzer, "", "");
+        analyzer.close();
     }
 
 }

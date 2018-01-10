@@ -119,6 +119,7 @@ public final class SolrSudachiTokenizer extends
         if (discardPunctuation) {
             for (; isPunctuation(morpheme.normalizedForm()); morpheme = iterator
                     .next()) {
+                lastEndOffset = baseOffset + morpheme.end();
                 if (!iterator.hasNext() && !tokenizeSentences()) {
                     return false;
                 }
@@ -245,7 +246,8 @@ public final class SolrSudachiTokenizer extends
         System.arraycopy(buffer, eos, buffer, 0, remainSize);
 
         baseOffset = nextBaseOffset;
-        //nextBaseOffset += eos;
+        // Without uncommenting this line, the offset is reset to 0 with the char in EOS_SYMBOL_LIST
+        nextBaseOffset += eos;
 
         return sentences;
     }

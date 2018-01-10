@@ -16,7 +16,12 @@ For example if you have a core named `core1`, then put the file in the same dire
 or `solrconfig.xml`.
 5. Configure schema.xml or managed-schema with the following setting.
 
-## Examples of schema.xml
+
+## Tokenizer
+
+### SolrSudachiTokenizerFactory
+
+#### Configuration
 
 ```xml
 <fieldType name="text_ja" class="solr.TextField">
@@ -36,8 +41,6 @@ or `solrconfig.xml`.
  </analyzer>
 </fieldType>
 ```
-
-### Configuration
 
 Basically `solr-sudachi` follows the config on
  [`elasticsearch-sudachi`](https://github.com/WorksApplications/elasticsearch-sudachi#configuration)
@@ -60,10 +63,10 @@ are available as a post processing of the `Tokenizer`.
 ### SudachiSurfaceFormFilterFactory
 
 `solr-sudachi` respects the behavior of `elasticsearch-sudachi`, which outputs 
-the *Normalized form* of the tokens instead of the *Surface* which are tokens from
-user's input text as it is. Sudachi's normalized form performs to make recall higher 
-as well as base form. But if you want to match exactly with the query and the index, 
-this filter would be useful.
+the *Normalized form* of the tokens instead of the *Surface form* which are tokens 
+from input text as it is. Sudachi's normalized form performs to make the analyzed 
+tokens respected more as well as base form. But if you want to match exactly with 
+the query and the index, this filter would be useful.
 
 #### Example
 
@@ -79,6 +82,24 @@ After the token filter
 |          |1    |2   |3   |4   |5   |
 |:---------|:----|:---|:---|:---|:---|
 |Tokens   |吾輩  |は|猫|で|ある|
+
+#### Configuration
+
+```xml
+<fieldType name="text_ja" class="solr.TextField">
+ <analyzer>
+   <tokenizer class="com.github.sh0nk.solr.sudachi.SolrSudachiTokenizerFactory"
+     mode="NORMAL"
+     systemDictPath="system_core.dic"
+     settingsPath="solr_sudachi.json"
+     discardPunctuation="true"
+   />
+   
+   <filter class="com.github.sh0nk.solr.sudachi.SudachiSurfaceFormFilterFactory" />
+ </analyzer>
+</fieldType>
+```
+
 
 ## Licenses
 
