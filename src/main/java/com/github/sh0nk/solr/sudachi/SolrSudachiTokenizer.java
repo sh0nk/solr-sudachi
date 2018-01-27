@@ -184,15 +184,16 @@ public final class SolrSudachiTokenizer extends
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
         lastEndOffset = baseOffset + morpheme.end();
-        offsetAtt.setOffset(baseOffset + morpheme.begin(),
-                lastEndOffset);
+        offsetAtt.setOffset(correctOffset(baseOffset + morpheme.begin()),
+                correctOffset(lastEndOffset));
 
         setTermAttribute(morpheme.normalizedForm());
     }
 
     private void setOOVAttribute(String str) throws IOException {
         lastEndOffset = baseOffset + oovBegin + 1;
-        offsetAtt.setOffset(baseOffset + oovBegin, lastEndOffset);
+        offsetAtt.setOffset(correctOffset(baseOffset + oovBegin),
+                correctOffset(lastEndOffset));
         oovBegin += 1;
         posLengthAtt.setPositionLength(1);
         if (oovIterator.previousIndex() == 0) {
