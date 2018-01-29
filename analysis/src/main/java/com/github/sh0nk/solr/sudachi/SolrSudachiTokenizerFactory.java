@@ -81,6 +81,9 @@ public class SolrSudachiTokenizerFactory extends TokenizerFactory implements Res
         }
         if (systemDictPath != null) {
             fixedSystemDictDir = resourceLoaderHelper.getResourcePath(systemDictPath).getParent().toString();
+        } else {
+            fixedSystemDictDir = resourceLoaderHelper.getConfigDir();
+            DictExtractor.extract(fixedSystemDictDir);
         }
     }
 
