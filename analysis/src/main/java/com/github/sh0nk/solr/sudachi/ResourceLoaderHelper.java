@@ -42,4 +42,8 @@ public class ResourceLoaderHelper {
                 + " or on " + inInstanceDir);
     }
 
+    public String getConfigDir() {
+        return resourceLoader.getConfigDir();
+    }
+
 }

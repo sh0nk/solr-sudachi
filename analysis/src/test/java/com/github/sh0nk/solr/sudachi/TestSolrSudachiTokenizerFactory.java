@@ -5,18 +5,20 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.solr.core.SolrResourceLoader;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TestSolrSudachiTokenizerFactory extends BaseTokenStreamTestCase {
 
-    private Tokenizer createTokenizer(Map<String, String> args) throws IOException {
-        String dictFile = SolrSudachiTokenizerFactory.class.getResource("/system_full.dic").getPath();
-        String settingsFile = SolrSudachiTokenizerFactory.class.getResource("/solr_sudachi.json").getPath();
+    private Tokenizer createTokenizer(Map<String, String> args) throws IOException, URISyntaxException {
+        String dictDir = new File(getClass().getResource("/system_full.dic").toURI()).getParent();
+        String settingsFile = getClass().getResource("/solr_sudachi.json").getPath();
         Map<String, String> map = new HashMap<>(args);
-        map.put("systemDictPath", dictFile);
+        map.put("systemDictDir", dictDir);
         map.put("settingsPath", settingsFile);
         SolrSudachiTokenizerFactory factory = new SolrSudachiTokenizerFactory(map);
         factory.inform(new SolrResourceLoader());
@@ -24,7 +26,7 @@ public class TestSolrSudachiTokenizerFactory extends BaseTokenStreamTestCase {
     }
 
     @Test
-    public void testDefault() throws IOException {
+    public void testDefault() throws IOException, URISyntaxException {
         Tokenizer tokenizer = createTokenizer(new HashMap<>());
         tokenizer.setReader(new StringReader("吾輩は猫である。"));
         assertTokenStreamContents(tokenizer,
@@ -33,7 +35,7 @@ public class TestSolrSudachiTokenizerFactory extends BaseTokenStreamTestCase {
     }
 
     @Test
-    public void testPunctuation() throws IOException {
+    public void testPunctuation() throws IOException, URISyntaxException {
         Tokenizer tokenizer = createTokenizer(new HashMap<String, String>() {{
             put("discardPunctuation", "false");
         }});
@@ -44,7 +46,7 @@ public class TestSolrSudachiTokenizerFactory extends BaseTokenStreamTestCase {
     }
 
     @Test
-    public void testExtended() throws IOException {
+    public void testExtended() throws IOException, URISyntaxException {
         Tokenizer tokenizer = createTokenizer(new HashMap<String, String>() {{
             put("mode", "EXTENDED");
         }});

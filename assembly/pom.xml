@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>solr-sudachi</artifactId>
+        <groupId>com.github.sh0nk</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>solr-sudachi-assembly</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.sh0nk</groupId>
+            <artifactId>solr-sudachi-analysis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Fat jar -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- replace built jar with a dependency resolved jar -->
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                <execution>
+                    <id>unpack-full-dic-assembly</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>com.worksap.nlp</groupId>
+                                <artifactId>sudachi</artifactId>
+                                <classifier>dictionary-core</classifier>
+                                <version>${sudachi.version}</version>
+                                <type>tar.bz2</type>
+                                <outputDirectory>src/main/resources</outputDirectory>
+                                <includes>system_core.dic</includes>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>com.worksap.nlp</groupId>
+                                <artifactId>sudachi</artifactId>
+                                <classifier>dictionary-full</classifier>
+                                <version>${sudachi.version}</version>
+                                <type>tar.bz2</type>
+                                <outputDirectory>src/main/resources</outputDirectory>
+                                <includes>system_full.dic</includes>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

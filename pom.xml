@@ -6,12 +6,20 @@
 
     <groupId>com.github.sh0nk</groupId>
     <artifactId>solr-sudachi</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+    <modules>
+        <module>analysis</module>
+        <module>assembly</module>
+        <module>assembly-test</module>
+    </modules>
 
     <properties>
         <solr.version>6.2.1</solr.version>
         <analysis-sudachi.version>1.0.0-SNAPSHOT</analysis-sudachi.version>
         <sudachi.version>0.1.1-SNAPSHOT</sudachi.version>
+        <commons-io.version>2.5</commons-io.version>
+        <commons-lang.version>2.6</commons-lang.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -31,54 +39,6 @@
         </repository>
     </repositories>
 
-    <dependencies>
-        <!-- Sudachi -->
-        <dependency>
-            <groupId>com.worksap.nlp</groupId>
-            <artifactId>analysis-sudachi</artifactId>
-            <version>${analysis-sudachi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.elasticsearch.client</groupId>
-                    <artifactId>transport</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.lucene</groupId>
-                    <artifactId>lucene-analyzers-kuromoji</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Lucene/Solr -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-            <version>${solr.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-test-framework</artifactId>
-            <version>${solr.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -91,102 +51,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/system_full.dic</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <!-- Fat jar -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-
-            <!-- For assembly/test with a real dictionary -->
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>src/test/resources/</directory>
-                            <includes>
-                                <include>system_full.dic</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <!-- TODO: This must be moved to another package to include dict file -->
-                    <!--
-                    <execution>
-                        <id>unpack-full-dic-assembly</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.worksap.nlp</groupId>
-                                    <artifactId>sudachi</artifactId>
-                                    <classifier>dictionary-full</classifier>
-                                    <version>${sudachi.version}</version>
-                                    <type>tar.bz2</type>
-                                    <outputDirectory>src/main/resources</outputDirectory>
-                                    <includes>system_full.dic</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    -->
-                    <execution>
-                        <id>unpack-full-dic-test</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.worksap.nlp</groupId>
-                                    <artifactId>sudachi</artifactId>
-                                    <classifier>dictionary-full</classifier>
-                                    <version>${sudachi.version}</version>
-                                    <type>tar.bz2</type>
-                                    <outputDirectory>src/test/resources</outputDirectory>
-                                    <includes>system_full.dic</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 

@@ -9,15 +9,16 @@ which includes the common lucene Tokenizer and TokenFilters.
 
 ## Install
 
-1. `mvn package` to generate `solr-sudachi-1.0.0-SNAPSHOT-jar-with-dependencies.jar` in `target/`.
-2. Put `solr-sudachi-1.0.0-SNAPSHOT-jar-with-dependencies.jar` on `${SOLR_HOME}/lib` directory.
-3. Download the latest Sudachi dictionary snapshot (sudachi-0.1.1-*-dictionary-core.zip) 
-from [here](https://oss.sonatype.org/content/repositories/snapshots/com/worksap/nlp/sudachi/0.1.1-SNAPSHOT/).
-4. Uncompress the dictionary zip and put the extracted `system_core.dic` into `${SOLR_HOME}` dir.
-For example if you have a core named `core1`, then put the file in the same directory as `core.properties`,
-or `solrconfig.xml`.
-5. Configure schema.xml or managed-schema with the following setting.
+1. Edit `properties/solr.version` with your solr's version on `pom.xml` (Default is 6.2.1)
+2. Do `mvn package` to generate `solr-sudachi-assembly-1.0.0-SNAPSHOT.jar` in `assembly/target/`.
+2. Put `solr-sudachi-assembly-1.0.0-SNAPSHOT.jar` on `${SOLR_HOME}/lib` directory.
+4. Configure schema.xml or managed-schema with the following setting, then start solr.
 
+## Version
+
+Solr 6.2.1 or above.
+
+Note that not all the versions are tested. Please report through issues if any problem found with a version.
 
 ## Tokenizer
 
@@ -33,8 +34,6 @@ or `solrconfig.xml`.
    
    <tokenizer class="com.github.sh0nk.solr.sudachi.SolrSudachiTokenizerFactory"
      mode="NORMAL"
-     systemDictPath="system_core.dic"
-     settingsPath="solr_sudachi.json"
      discardPunctuation="true"
    />
    
@@ -48,14 +47,24 @@ Basically `solr-sudachi` follows the config on
  [`elasticsearch-sudachi`](https://github.com/WorksApplications/elasticsearch-sudachi#configuration)
 as much as possible. Here it explains only the difference from that.
 
-- `systemDictPath`: Put the relative file path from `${SOLR_HOME}`, or 
-absolute path to the dict file. The file name must follow the `settingsPath`'s 
-`systemDict` property. All the other Sudachi system files such as `char.def` or 
+As default, `system_full.dic` which is provided by Sudachi is used as a dictionary.
+And [`solr_sudachi.json`](https://github.com/sh0nk/solr-sudachi/blob/develop/assembly/src/main/resources/solr_sudachi.json)
+is used as a tokenizer plugin setting. So the above setting is everything to start with, 
+but if you want to customize, the following properties are available to configure.
+
+- `settingsPath`: Put the sudachi json configuration with 
+the relative file path from `${SOLR_HOME}/conf`, or absolute path to the dict file.
+- `systemDictDir`: Put the relative directory path from `${SOLR_HOME}/conf`, or 
+absolute path to the dict file directory. All the other Sudachi system files such as `char.def` or 
 `rewrite.def` which are specified on `settingsPath` are the relative path 
-from the `systemDictPath`. For the above example, they should be put
-in the same "sudachi" directory.
-- `settingsPath`: Put the sudachi json configuration. 
-If `settingsPath` is not provided, Sudachi's default settings are used.
+from the `systemDictPath`. For example, if `systemDictDir="sudachi"` is given, 
+they should be put in the same "sudachi" directory.
+
+`system_full.dic` and `system_core.dic` are bundled in `solr-sudachi` jar.
+If one of the names is given in `system_dict` property on settings json,
+solr-sudachi extracts it into `systemDictDir`. If it is not given, then 
+the extracted file goes to `${SOLR_HOME}/conf`.
+
 
 ## Token Filters
 
@@ -85,6 +94,7 @@ After the token filter
 |:---------|:----|:---|:---|:---|:---|
 |Tokens   |吾輩  |は|猫|で|ある|
 
+
 #### Configuration
 
 ```xml
@@ -92,8 +102,6 @@ After the token filter
  <analyzer>
    <tokenizer class="com.github.sh0nk.solr.sudachi.SolrSudachiTokenizerFactory"
      mode="NORMAL"
-     systemDictPath="system_core.dic"
-     settingsPath="solr_sudachi.json"
      discardPunctuation="true"
    />
    
