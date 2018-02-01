@@ -54,6 +54,11 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+        </dependency>
 
         <!-- Test -->
         <dependency>
@@ -71,7 +76,7 @@
                 <!--<directory>${project.basedir}/src/test/resources</directory>-->
             <!--</testResource>-->
             <testResource>
-                <directory>${project.basedir}/src/main/resources</directory>
+                <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
         </testResources>
 
@@ -98,7 +103,7 @@
                 <executions>
                     <execution>
                         <id>unpack-full-dic-test</id>
-                        <phase>generate-resources</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>

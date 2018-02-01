@@ -4,24 +4,29 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 public class DictExtractor {
-    private static final String[] DICTS = new String[] {"/system_core.dic", "/system_full.dic"};
+    private final String fileName;
 
-    public static void extract(String configDir) throws IOException {
-        for (String dict : DICTS) {
-            URL dictUrl = DictExtractor.class.getResource(dict);
-            File newFile = new File(configDir, dict);
-            if (newFile.exists()) {
-                continue;
-            }
+    public DictExtractor(String fileName) {
+        this.fileName = fileName;
+    }
 
-            try {
-                FileUtils.copyURLToFile(dictUrl, newFile);
-            } catch (IOException e) {
-                throw new IOException("Dictionary file cannot be extracted from jar file to Solr config dir.", e);
-            }
+    public String extractTo(String targetDir) throws IOException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+
+        File newFile = new File(targetDir, fileName);
+        if (newFile.exists()) {
+            return null;
+        }
+
+        try {
+            FileUtils.copyToFile(in, newFile);
+            return newFile.getAbsolutePath();
+        } catch (IOException e) {
+            throw new IOException(String.format(
+                    "Dictionary file %s cannot be extracted from jar file to Solr config dir.", fileName), e);
         }
     }
 }

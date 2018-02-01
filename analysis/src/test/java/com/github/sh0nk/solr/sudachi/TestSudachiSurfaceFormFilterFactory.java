@@ -7,7 +7,9 @@ import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.solr.core.SolrResourceLoader;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +17,11 @@ import java.util.Map;
 public class TestSudachiSurfaceFormFilterFactory extends BaseTokenStreamTestCase {
     private Analyzer analyzer;
 
-    private Tokenizer createTokenizer(Map<String, String> args) throws IOException {
-        String dictFile = SolrSudachiTokenizerFactory.class.getResource("/system_full.dic").getPath();
-        String settingsFile = SolrSudachiTokenizerFactory.class.getResource("/solr_sudachi.json").getPath();
+    private Tokenizer createTokenizer(Map<String, String> args) throws IOException, URISyntaxException {
+        String dictDir = new File(getClass().getResource("/system_full.dic").toURI()).getParent();
+        String settingsFile = getClass().getResource("/solr_sudachi.json").getPath();
         Map<String, String> map = new HashMap<>(args);
-        map.put("systemDictPath", dictFile);
+        map.put("systemDictDir", dictDir);
         map.put("settingsPath", settingsFile);
         SolrSudachiTokenizerFactory factory = new SolrSudachiTokenizerFactory(map);
         factory.inform(new SolrResourceLoader());
@@ -36,7 +38,7 @@ public class TestSudachiSurfaceFormFilterFactory extends BaseTokenStreamTestCase
                     Tokenizer tokenizer = createTokenizer(Collections.emptyMap());
                     return new TokenStreamComponents(tokenizer,
                             new SudachiSurfaceFormFilterFactory(Collections.emptyMap()).create(tokenizer));
-                } catch (IOException e) {
+                } catch (IOException | URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
             }

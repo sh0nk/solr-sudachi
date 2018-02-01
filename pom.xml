@@ -11,13 +11,15 @@
     <modules>
         <module>analysis</module>
         <module>assembly</module>
+        <module>assembly-test</module>
     </modules>
 
     <properties>
         <solr.version>6.2.1</solr.version>
         <analysis-sudachi.version>1.0.0-SNAPSHOT</analysis-sudachi.version>
         <sudachi.version>0.1.1-SNAPSHOT</sudachi.version>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.5</commons-io.version>
+        <commons-lang.version>2.6</commons-lang.version>
         <junit.version>4.12</junit.version>
     </properties>
 
