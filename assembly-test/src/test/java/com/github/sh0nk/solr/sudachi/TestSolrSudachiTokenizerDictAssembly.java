@@ -1,6 +1,5 @@
 package com.github.sh0nk.solr.sudachi;
 
-import com.google.common.collect.Maps;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.core.SolrResourceLoader;
@@ -57,6 +56,20 @@ public class TestSolrSudachiTokenizerDictAssembly extends SolrTestCaseJ4 {
 
         Map<String, String> args = new HashMap<>();
         args.put("settingsPath", "solr_sudachi.json");
+        Tokenizer tokenizer = createTokenizer(args);
+        tokenizer.setReader(new StringReader("吾輩は猫である。"));
+        assertTokenStreamContents(tokenizer,
+                new String[] {"我が輩", "は", "猫", "だ", "有る"}
+        );
+    }
+
+    @Test
+    public void testOnlyDictDir() throws Exception {
+        initCore();
+
+        Map<String, String> args = new HashMap<>();
+        String dir = createTempDir().toString();
+        args.put("systemDictDir", dir);
         Tokenizer tokenizer = createTokenizer(args);
         tokenizer.setReader(new StringReader("吾輩は猫である。"));
         assertTokenStreamContents(tokenizer,
